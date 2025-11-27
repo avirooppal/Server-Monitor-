@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: monitoring_postgres
+    environment:
+      POSTGRES_DB: monitoring
+      POSTGRES_USER: monitor
+      POSTGRES_PASSWORD: secret
+    ports:
+      - "5434:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U monitor -d monitoring"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: monitoring_backend
+    ports:
+      - "8082:8080"
+    environment:
+      DATABASE_URL: postgres://monitor:secret@postgres:5432/monitoring?sslmode=disable
+      GIN_MODE: release
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./web:/root/web
+    restart: unless-stopped
+
+  agent:
+    build: ./agent
+    container_name: monitoring_agent
+    environment:
+      API_URL: http://backend:8080
+      HOST_PROC: /host/proc
+      HOST_SYS: /host/sys
+      HOST_ETC: /host/etc
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /etc:/host/etc:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    privileged: true
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  postgres_data:

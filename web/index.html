@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Server Monitor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/web/style.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M3 3H21V21H3V3Z" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                        <path d="M9 3V21" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                        <path d="M3 9H21" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                </div>
+                <span class="logo-text">Monitor</span>
+            </div>
+
+            <nav class="nav-menu">
+                <button class="nav-item active" data-view="overview">
+                    <span class="nav-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <rect x="3" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="14" width="7" height="7"></rect>
+                            <rect x="3" y="14" width="7" height="7"></rect>
+                        </svg>
+                    </span>
+                    Overview
+                </button>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="status-indicator"></div>
+                <span class="status-label">Connecting...</span>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="top-bar">
+                <div class="server-info">
+                    <h1 id="server-hostname">Loading...</h1>
+                    <div class="server-meta">
+                        <span class="meta-item" id="server-ip">—</span>
+                        <span class="meta-separator">•</span>
+                        <span class="meta-item" id="server-os">—</span>
+                        <span class="meta-separator">•</span>
+                        <span class="meta-item" id="server-uptime">—</span>
+                    </div>
+                </div>
+                <div class="last-updated">
+                    Updated: <span id="last-update-time">—</span>
+                </div>
+            </header>
+
+            <!-- Views Container -->
+            <div class="views-container">
+
+                <!-- Overview View -->
+                <div class="view active" id="view-overview">
+
+                    <!-- System Info Section -->
+                    <div class="card full-width mb-4">
+                        <div class="card-header">
+                            <h3>System Info</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="info-grid">
+                                <div class="info-item">
+                                    <span class="label">CPU Model</span>
+                                    <span class="value" id="sys-cpu-model">—</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="label">Kernel</span>
+                                    <span class="value" id="sys-kernel">—</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="label">Total RAM</span>
+                                    <span class="value" id="sys-total-ram">—</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="label">Cores</span>
+                                    <span class="value" id="sys-cores">—</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid-layout">
+                        <!-- CPU Section -->
+                        <div class="card metric-card">
+                            <div class="card-header">
+                                <h3>CPU</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="numeric-row">
+                                    <span class="label">Usage</span>
+                                    <span class="numeric-value" id="cpu-usage-val">0%</span>
+                                </div>
+                                <div class="numeric-row">
+                                    <span class="label">Load Avg</span>
+                                    <span class="numeric-value small" id="cpu-load-val">0.00 / 0.00 / 0.00</span>
+                                </div>
+                                <div class="divider"></div>
+                                <h4>Per-Core Utilization</h4>
+                                <ul class="numeric-list" id="cpu-cores-list">
+                                    <!-- Populated by JS -->
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Memory Section -->
+                        <div class="card metric-card">
+                            <div class="card-header">
+                                <h3>Memory</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="numeric-row">
+                                    <span class="label">RAM Usage</span>
+                                    <span class="numeric-value" id="ram-usage-percent">0%</span>
+                                </div>
+                                <div class="numeric-row">
+                                    <span class="label">Used / Total</span>
+                                    <span class="numeric-value small" id="ram-usage-abs">0 GB / 0 GB</span>
+                                </div>
+                                <div class="divider"></div>
+                                <h4>Swap</h4>
+                                <div class="numeric-row">
+                                    <span class="label">Usage</span>
+                                    <span class="numeric-value" id="swap-usage-percent">0%</span>
+                                </div>
+                                <div class="numeric-row">
+                                    <span class="label">Used / Total</span>
+                                    <span class="numeric-value small" id="swap-usage-abs">0 GB / 0 GB</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Disk Section -->
+                        <div class="card metric-card">
+                            <div class="card-header">
+                                <h3>Disk</h3>
+                            </div>
+                            <div class="card-body">
+                                <h4>I/O Throughput</h4>
+                                <div class="numeric-row">
+                                    <span class="label">Read</span>
+                                    <span class="numeric-value" id="disk-io-read">0 MB/s</span>
+                                </div>
+                                <div class="numeric-row">
+                                    <span class="label">Write</span>
+                                    <span class="numeric-value" id="disk-io-write">0 MB/s</span>
+                                </div>
+                                <div class="divider"></div>
+                                <h4>Partitions</h4>
+                                <ul class="numeric-list" id="disk-partitions-list">
+                                    <!-- Populated by JS -->
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Network Section -->
+                        <div class="card metric-card">
+                            <div class="card-header">
+                                <h3>Network</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="numeric-row">
+                                    <span class="label">Inbound</span>
+                                    <span class="numeric-value" id="net-in-rate">0 bps</span>
+                                </div>
+                                <div class="numeric-row">
+                                    <span class="label">Outbound</span>
+                                    <span class="numeric-value" id="net-out-rate">0 bps</span>
+                                </div>
+                                <div class="numeric-row">
+                                    <span class="label">Latency</span>
+                                    <span class="numeric-value" id="net-latency-val">0 ms</span>
+                                </div>
+                                <div class="divider"></div>
+                                <h4>Interfaces</h4>
+                                <ul class="numeric-list" id="net-interfaces-list">
+                                    <!-- Populated by JS -->
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Top Processes Section -->
+                    <div class="card full-width mt-4">
+                        <div class="card-header">
+                            <h3>Top Processes</h3>
+                        </div>
+                        <div class="card-body no-padding">
+                            <div class="table-container">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>PID</th>
+                                            <th>Name</th>
+                                            <th>User</th>
+                                            <th>CPU%</th>
+                                            <th>MEM%</th>
+                                            <th>Read/s</th>
+                                            <th>Write/s</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="processes-tbody">
+                                        <!-- Populated by JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Containers Section -->
+                    <div class="card full-width mt-4">
+                        <div class="card-header">
+                            <h3>Containers</h3>
+                        </div>
+                        <div class="card-body no-padding">
+                            <div class="table-container">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>State</th>
+                                            <th>CPU%</th>
+                                            <th>Mem</th>
+                                            <th>Net I/O</th>
+                                            <th>Block I/O</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="containers-tbody">
+                                        <!-- Populated by JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="/web/app.js"></script>
+</body>
+
+</html>
